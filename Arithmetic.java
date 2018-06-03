@@ -6,6 +6,7 @@ public class Arithmetic {
 
     private final int NUM_MAX = 3;
     private ArrayList<Character> operators = new ArrayList<>();
+    private boolean found = false;
 
     public ArrayList<Character> handleLines(String[] eq) {
         String[] inputsStr = eq[0].split(" ");
@@ -21,44 +22,40 @@ public class Arithmetic {
         } catch (NumberFormatException e) {
             e.printStackTrace();
         }
-        Boolean isSolvable = solve(input, 1, input[0], result);
+        int isSolvable = solve(input, 1, input[0], result);
         System.out.println(isSolvable);
-        return isSolvable ? this.operators : new ArrayList<Character>('x');
+        return isSolvable == 1 ? this.operators : new ArrayList<Character>('x');
         
     }
 
-    public Boolean solve(int[] operands, int pos, int total, int target) {
+    public int solve(int[] operands, int pos, int total, int target) {
         int currNum = operands[pos];
-        if (pos > operands.length - 1 || currNum * total > target || currNum + total > target) {
-            //this.operators.remove(operators.size() - 1);
-            return false;
-        }
+        if (found) return 1;
 
         if (pos == operands.length - 1) {
             if (currNum + total == target) {
-                
-                return true;
+                operators.add('+');
+                found = true;
+                return 1;
             }
             if (currNum * total == target) {
-                
-                return true;
+                operators.add('*');
+                found = true;
+                return 1;
             }
         } else {
             if (currNum + total < target) {
-                
-                if (solve(operands, ++pos, currNum + total, target)) {
-                    this.operators.add('+');
-                    return true;
-                }
+                this.operators.add('+');
+                return solve(operands, pos + 1, currNum + total, target);      
             }
             if (currNum * total < target) {
                 
-                if (solve(operands, ++pos, currNum * total, target)) {
+                if (solve(operands, pos + 1, currNum * total, target) == 2) {
                     this.operators.add('*');
-                    return true;
+                    return 3;
                 }
             }
         }
-        return false;
+        return 0;
     }
 }
